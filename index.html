@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora CONUT | Herramienta Clínica</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS (CDN for standalone file) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Configuración de Tailwind y Estilos Custom -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                    colors: {
+                        medical: {
+                            50: '#F5F7FA',
+                            100: '#E4E9F2',
+                            500: '#3B82F6',
+                            600: '#2563EB',
+                            900: '#1E293B',
+                        },
+                        severity: {
+                            normal: '#10B981', // Emerald 500
+                            low: '#F59E0B',    // Amber 500
+                            moderate: '#F97316', // Orange 500
+                            high: '#EF4444',   // Red 500
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #F5F7FA;
+            color: #1E293B;
+            -webkit-font-smoothing: antialiased;
+        }
+        
+        /* Smooth scrolling for anchor links */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* Hide number input spinners */
+        input[type=number]::-webkit-inner-spin-button, 
+        input[type=number]::-webkit-outer-spin-button { 
+            -webkit-appearance: none; 
+            margin: 0; 
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8; 
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+            border: 1px solid #E2E8F0;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .input-group:focus-within label {
+            color: #2563EB;
+        }
+        
+        .input-group:focus-within input {
+            border-color: #2563EB;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        /* Sticky nav offset */
+        section {
+            scroll-margin-top: 140px;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <!-- Header Global -->
+    <header class="bg-white border-b border-gray-200 sticky top-0 z-50">
+        <div class="max-w-[1400px] w-[95%] mx-auto px-4 py-4">
+            <div class="flex flex-col md:flex-row justify-between items-center gap-4">
+                <div class="flex items-center gap-3">
+                    <div class="bg-blue-600 text-white p-2 rounded-lg shadow-sm">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                        </svg>
+                    </div>
+                    <div>
+                        <h1 class="text-xl font-bold text-gray-900 leading-tight">Calculadora CONUT</h1>
+                        <p class="text-sm text-gray-500">Control Nutricional (Albúmina + Linfocitos + Colesterol)</p>
+                    </div>
+                </div>
+                
+                <div class="flex items-center gap-4">
+                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                        Rango Total: 0-12
+                    </span>
+                    <p class="text-xs text-gray-400 hidden lg:block">Herramienta de apoyo, no sustituye juicio clínico.</p>
+                </div>
+            </div>
+
+            <!-- Navegación Sticky -->
+            <nav class="mt-4 flex gap-6 border-t border-gray-100 pt-3 overflow-x-auto text-sm font-medium text-gray-600">
+                <a href="#panel" class="hover:text-blue-600 whitespace-nowrap pb-2 border-b-2 border-transparent hover:border-blue-600 transition-colors">PANEL</a>
+                <a href="#calculadora" class="hover:text-blue-600 whitespace-nowrap pb-2 border-b-2 border-transparent hover:border-blue-600 transition-colors">CALCULADORA</a>
+                <a href="#interpretacion" class="hover:text-blue-600 whitespace-nowrap pb-2 border-b-2 border-transparent hover:border-blue-600 transition-colors">INTERPRETACIÓN</a>
+                <a href="#info" class="hover:text-blue-600 whitespace-nowrap pb-2 border-b-2 border-transparent hover:border-blue-600 transition-colors">INFO & REFERENCIA</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-grow max-w-[1400px] w-[95%] mx-auto px-4 py-8 space-y-8">
+
+        <!-- SECCIÓN 1: PANEL (DASHBOARD) -->
+        <section id="panel" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <!-- Puntuación Total -->
+            <div class="card p-6 flex flex-col justify-between relative overflow-hidden">
+                <div class="z-10">
+                    <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wider">Puntuación Total</h3>
+                    <div class="mt-2 flex items-baseline">
+                        <span id="display-total" class="text-5xl font-extrabold text-gray-900">-</span>
+                        <span class="ml-2 text-gray-400 font-medium">/ 12</span>
+                    </div>
+                </div>
+                <div id="bg-indicator" class="absolute right-0 top-0 h-full w-2 bg-gray-200"></div>
+            </div>
+
+            <!-- Grado de Alerta -->
+            <div class="card p-6 flex flex-col justify-between">
+                <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wider">Grado de Alerta</h3>
+                <div class="mt-4">
+                    <span id="badge-alert" class="inline-flex items-center px-4 py-2 rounded-full text-sm font-bold bg-gray-100 text-gray-500">
+                        Esperando datos...
+                    </span>
+                </div>
+            </div>
+
+            <!-- Desglose Rápido -->
+            <div class="card p-6">
+                <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-4">Desglose Puntos</h3>
+                <ul class="space-y-3 text-sm">
+                    <li class="flex justify-between items-center">
+                        <span class="text-gray-600">Albúmina:</span>
+                        <span id="score-alb" class="font-mono font-bold text-gray-900">-</span>
+                    </li>
+                    <li class="flex justify-between items-center">
+                        <span class="text-gray-600">Linfocitos:</span>
+                        <span id="score-lym" class="font-mono font-bold text-gray-900">-</span>
+                    </li>
+                    <li class="flex justify-between items-center">
+                        <span class="text-gray-600">Colesterol:</span>
+                        <span id="score-cho" class="font-mono font-bold text-gray-900">-</span>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Estado Validación -->
+            <div class="card p-6 flex flex-col justify-center items-center text-center">
+                <div id="status-icon" class="mb-2 text-gray-300">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                </div>
+                <p id="status-text" class="text-sm text-gray-500">Ingresa los 3 valores para calcular.</p>
+            </div>
+        </section>
+
+        <!-- SECCIÓN 2: CALCULADORA -->
+        <section id="calculadora" class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            
+            <!-- Columna Izquierda: Inputs -->
+            <div class="lg:col-span-7 space-y-6">
+                <div class="card p-8">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-xl font-bold text-gray-900">Parámetros Clínicos</h2>
+                        <button onclick="resetCalculator()" class="text-sm text-gray-500 hover:text-blue-600 underline">Limpiar formulario</button>
+                    </div>
+
+                    <div class="space-y-6">
+                        <!-- Input Albúmina -->
+                        <div class="input-group">
+                            <label for="albumin" class="block text-sm font-medium text-gray-700 mb-2">
+                                1. Albúmina Sérica <span class="text-red-400">*</span>
+                            </label>
+                            <div class="relative rounded-md shadow-sm">
+                                <input type="number" step="0.01" id="albumin" 
+                                    class="block w-full rounded-lg border-gray-300 pl-4 pr-16 py-3 text-lg focus:border-blue-500 focus:ring-blue-500 border transition-colors bg-gray-50" 
+                                    placeholder="Ej: 3.5" oninput="calculateCONUT()">
+                                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-4">
+                                    <span class="text-gray-500 sm:text-sm font-medium bg-gray-200 px-2 py-1 rounded">g/dL</span>
+                                </div>
+                            </div>
+                            <p class="mt-1 text-xs text-gray-500">Permite decimales (usa punto o coma)</p>
+                        </div>
+
+                        <!-- Input Linfocitos -->
+                        <div class="input-group">
+                            <label for="lymphocytes" class="block text-sm font-medium text-gray-700 mb-2">
+                                2. Linfocitos Totales <span class="text-red-400">*</span>
+                            </label>
+                            <div class="relative rounded-md shadow-sm">
+                                <input type="number" id="lymphocytes" pattern="\d*"
+                                    class="block w-full rounded-lg border-gray-300 pl-4 pr-16 py-3 text-lg focus:border-blue-500 focus:ring-blue-500 border transition-colors bg-gray-50" 
+                                    placeholder="Ej: 1600" oninput="calculateCONUT()">
+                                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-4">
+                                    <span class="text-gray-500 sm:text-sm font-medium bg-gray-200 px-2 py-1 rounded">/mm³</span>
+                                </div>
+                            </div>
+                            <p class="mt-1 text-xs text-gray-500">Valor entero</p>
+                        </div>
+
+                        <!-- Input Colesterol -->
+                        <div class="input-group">
+                            <label for="cholesterol" class="block text-sm font-medium text-gray-700 mb-2">
+                                3. Colesterol Total <span class="text-red-400">*</span>
+                            </label>
+                            <div class="relative rounded-md shadow-sm">
+                                <input type="number" id="cholesterol" pattern="\d*"
+                                    class="block w-full rounded-lg border-gray-300 pl-4 pr-16 py-3 text-lg focus:border-blue-500 focus:ring-blue-500 border transition-colors bg-gray-50" 
+                                    placeholder="Ej: 180" oninput="calculateCONUT()">
+                                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-4">
+                                    <span class="text-gray-500 sm:text-sm font-medium bg-gray-200 px-2 py-1 rounded">mg/dL</span>
+                                </div>
+                            </div>
+                            <p class="mt-1 text-xs text-gray-500">Valor entero</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Columna Derecha: Resultados Live -->
+            <div class="lg:col-span-5 space-y-6">
+                <div class="card bg-blue-50 border-blue-100 p-6">
+                    <h3 class="text-blue-900 font-bold text-lg mb-4">Análisis en Tiempo Real</h3>
+                    
+                    <div class="space-y-4">
+                        <!-- Albúmina Detalle -->
+                        <div id="detail-alb" class="flex justify-between items-center p-3 bg-white rounded-lg border border-blue-100 opacity-50 transition-opacity">
+                            <div>
+                                <p class="text-xs text-gray-500 uppercase">Albúmina</p>
+                                <p class="font-medium text-gray-900" id="val-alb">--</p>
+                            </div>
+                            <div class="text-right">
+                                <span class="block text-xl font-bold text-gray-900" id="pts-alb">-</span>
+                                <span class="text-[10px] text-gray-500">puntos</span>
+                            </div>
+                        </div>
+
+                        <!-- Linfocitos Detalle -->
+                        <div id="detail-lym" class="flex justify-between items-center p-3 bg-white rounded-lg border border-blue-100 opacity-50 transition-opacity">
+                            <div>
+                                <p class="text-xs text-gray-500 uppercase">Linfocitos</p>
+                                <p class="font-medium text-gray-900" id="val-lym">--</p>
+                            </div>
+                            <div class="text-right">
+                                <span class="block text-xl font-bold text-gray-900" id="pts-lym">-</span>
+                                <span class="text-[10px] text-gray-500">puntos</span>
+                            </div>
+                        </div>
+
+                        <!-- Colesterol Detalle -->
+                        <div id="detail-cho" class="flex justify-between items-center p-3 bg-white rounded-lg border border-blue-100 opacity-50 transition-opacity">
+                            <div>
+                                <p class="text-xs text-gray-500 uppercase">Colesterol</p>
+                                <p class="font-medium text-gray-900" id="val-cho">--</p>
+                            </div>
+                            <div class="text-right">
+                                <span class="block text-xl font-bold text-gray-900" id="pts-cho">-</span>
+                                <span class="text-[10px] text-gray-500">puntos</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECCIÓN 3: INTERPRETACIÓN -->
+        <section id="interpretacion">
+            <h2 class="text-xl font-bold text-gray-900 mb-6">Interpretación Clínica</h2>
+            <div class="card overflow-hidden">
+                <div class="grid grid-cols-1 md:grid-cols-12">
+                    <div class="p-8 md:col-span-8">
+                        <h3 class="text-lg font-semibold text-gray-900 mb-2">Estado Nutricional del Paciente</h3>
+                        <p id="interpretation-text" class="text-gray-600 mb-6 text-lg">
+                            Completa los datos arriba para ver la interpretación clínica detallada.
+                        </p>
+                        
+                        <div class="bg-gray-50 rounded-lg p-4 border border-gray-100">
+                            <h4 class="text-sm font-semibold text-gray-700 mb-3">Guía rápida de severidad:</h4>
+                            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-center text-xs">
+                                <div class="p-2 rounded bg-emerald-100 text-emerald-800 font-medium">0-1: Normal</div>
+                                <div class="p-2 rounded bg-amber-100 text-amber-800 font-medium">2-4: Leve</div>
+                                <div class="p-2 rounded bg-orange-100 text-orange-800 font-medium">5-8: Moderada</div>
+                                <div class="p-2 rounded bg-red-100 text-red-800 font-medium">9-12: Grave</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-gray-50 p-8 md:col-span-4 border-l border-gray-100 flex items-center justify-center">
+                        <div class="text-center">
+                            <span class="block text-sm text-gray-500 mb-1">Riesgo Calculado</span>
+                            <div id="risk-gauge" class="w-32 h-32 rounded-full border-8 border-gray-200 flex items-center justify-center mx-auto transition-colors duration-500">
+                                <span id="risk-gauge-text" class="text-3xl font-bold text-gray-300">--</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECCIÓN 4: INFO -->
+        <section id="info" class="pb-12">
+            <h2 class="text-xl font-bold text-gray-900 mb-6">Referencia y Metodología</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <!-- Tabla de Referencia -->
+                <div class="card p-6">
+                    <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-4">Tabla de Puntuación (Fuente CONUT)</h3>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm text-left text-gray-600">
+                            <thead class="text-xs text-gray-700 uppercase bg-gray-50">
+                                <tr>
+                                    <th class="px-4 py-3 rounded-tl-lg">Parámetro</th>
+                                    <th class="px-4 py-3">Rango</th>
+                                    <th class="px-4 py-3 text-right rounded-tr-lg">Puntos</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-100">
+                                <!-- Albúmina -->
+                                <tr class="bg-white"><td class="px-4 py-2 font-medium" rowspan="4">Albúmina<br><span class="text-xs font-normal text-gray-400">(g/dL)</span></td><td class="px-4 py-2">≥ 3.50</td><td class="px-4 py-2 text-right font-bold text-gray-900">0</td></tr>
+                                <tr class="bg-white"><td class="px-4 py-2">3.00 – 3.49</td><td class="px-4 py-2 text-right font-bold text-gray-900">2</td></tr>
+                                <tr class="bg-white"><td class="px-4 py-2">2.50 – 2.99</td><td class="px-4 py-2 text-right font-bold text-gray-900">4</td></tr>
+                                <tr class="bg-white"><td class="px-4 py-2">< 2.50</td><td class="px-4 py-2 text-right font-bold text-gray-900">6</td></tr>
+                                
+                                <!-- Linfocitos -->
+                                <tr class="bg-gray-50/50"><td class="px-4 py-2 font-medium" rowspan="4">Linfocitos<br><span class="text-xs font-normal text-gray-400">(/mm³)</span></td><td class="px-4 py-2">≥ 1600</td><td class="px-4 py-2 text-right font-bold text-gray-900">0</td></tr>
+                                <tr class="bg-gray-50/50"><td class="px-4 py-2">1200 – 1599</td><td class="px-4 py-2 text-right font-bold text-gray-900">1</td></tr>
+                                <tr class="bg-gray-50/50"><td class="px-4 py-2">800 – 1199</td><td class="px-4 py-2 text-right font-bold text-gray-900">2</td></tr>
+                                <tr class="bg-gray-50/50"><td class="px-4 py-2">< 800</td><td class="px-4 py-2 text-right font-bold text-gray-900">3</td></tr>
+                                
+                                <!-- Colesterol -->
+                                <tr class="bg-white"><td class="px-4 py-2 font-medium" rowspan="4">Colesterol<br><span class="text-xs font-normal text-gray-400">(mg/dL)</span></td><td class="px-4 py-2">≥ 180</td><td class="px-4 py-2 text-right font-bold text-gray-900">0</td></tr>
+                                <tr class="bg-white"><td class="px-4 py-2">140 – 179</td><td class="px-4 py-2 text-right font-bold text-gray-900">1</td></tr>
+                                <tr class="bg-white"><td class="px-4 py-2">100 – 139</td><td class="px-4 py-2 text-right font-bold text-gray-900">2</td></tr>
+                                <tr class="bg-white"><td class="px-4 py-2">< 100</td><td class="px-4 py-2 text-right font-bold text-gray-900">3</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Cómo se calcula -->
+                <div class="card p-6">
+                    <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-4">Metodología</h3>
+                    <p class="text-gray-600 mb-4">
+                        El índice de Control Nutricional (CONUT) se calcula sumando las puntuaciones individuales asignadas a los niveles de albúmina sérica, recuento total de linfocitos y colesterol total.
+                    </p>
+                    <div class="bg-blue-50 p-4 rounded-lg border border-blue-100">
+                        <p class="font-medium text-blue-900 text-sm">Fórmula:</p>
+                        <p class="text-blue-800 font-mono mt-1 text-lg">Total = Puntos(Alb) + Puntos(Linf) + Puntos(Col)</p>
+                    </div>
+                    <p class="text-xs text-gray-400 mt-4">
+                        Desarrollado originalmente como una herramienta de cribado para la detección temprana y control de la desnutrición clínica en pacientes hospitalizados.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-white border-t border-gray-200 mt-auto py-8">
+        <div class="max-w-[1400px] w-[95%] mx-auto px-4 text-center text-gray-400 text-sm">
+            <p>&copy; 2023 Calculadora Clínica CONUT. Uso exclusivo profesional.</p>
+        </div>
+    </footer>
+
+    <!-- LÓGICA DE JAVASCRIPT -->
+    <script>
+        // Funciones de cálculo puras
+        const getAlbuminScore = (val) => {
+            if (val >= 3.50) return 0;
+            if (val >= 3.00) return 2;
+            if (val >= 2.50) return 4;
+            return 6;
+        };
+
+        const getLymphocyteScore = (val) => {
+            if (val >= 1600) return 0;
+            if (val >= 1200) return 1;
+            if (val >= 800) return 2;
+            return 3;
+        };
+
+        const getCholesterolScore = (val) => {
+            if (val >= 180) return 0;
+            if (val >= 140) return 1;
+            if (val >= 100) return 2;
+            return 3;
+        };
+
+        const getAlertLevel = (total) => {
+            if (total <= 1) return { level: 'Sin Alerta', class: 'bg-emerald-100 text-emerald-800', border: 'border-emerald-500', textClass: 'text-emerald-500' };
+            if (total <= 4) return { level: 'Alerta BAJA', class: 'bg-amber-100 text-amber-800', border: 'border-amber-500', textClass: 'text-amber-500' };
+            if (total <= 8) return { level: 'Alerta MODERADA', class: 'bg-orange-100 text-orange-800', border: 'border-orange-500', textClass: 'text-orange-500' };
+            return { level: 'Alerta ALTA', class: 'bg-red-100 text-red-800', border: 'border-red-500', textClass: 'text-red-500' };
+        };
+
+        const getInterpretationText = (total) => {
+            if (total <= 1) return "El paciente se encuentra dentro de rangos normales. No se detecta riesgo de desnutrición clínica según los parámetros actuales.";
+            if (total <= 4) return "Se detecta un riesgo leve de desnutrición. Se recomienda monitoreo y revisión de la ingesta dietética.";
+            if (total <= 8) return "Riesgo moderado de desnutrición. Requiere intervención nutricional y seguimiento estricto de los parámetros.";
+            return "Riesgo severo de desnutrición. Situación crítica que requiere intervención nutricional inmediata y soporte clínico.";
+        };
+
+        // Función principal de UI
+        function calculateCONUT() {
+            // Obtener inputs (parseando coma a punto por si acaso)
+            const albInput = document.getElementById('albumin').value.replace(',', '.');
+            const lymInput = document.getElementById('lymphocytes').value;
+            const choInput = document.getElementById('cholesterol').value;
+
+            const alb = parseFloat(albInput);
+            const lym = parseInt(lymInput);
+            const cho = parseInt(choInput);
+
+            // Validar si hay datos
+            const hasAlb = !isNaN(alb) && albInput !== '';
+            const hasLym = !isNaN(lym) && lymInput !== '';
+            const hasCho = !isNaN(cho) && choInput !== '';
+
+            // Update Input Status (Visual active state)
+            updateDetailRow('detail-alb', 'val-alb', 'pts-alb', hasAlb, alb, hasAlb ? getAlbuminScore(alb) : 0);
+            updateDetailRow('detail-lym', 'val-lym', 'pts-lym', hasLym, lym, hasLym ? getLymphocyteScore(lym) : 0);
+            updateDetailRow('detail-cho', 'val-cho', 'pts-cho', hasCho, cho, hasCho ? getCholesterolScore(cho) : 0);
+
+            // Si faltan datos, estado incompleto
+            if (!hasAlb || !hasLym || !hasCho) {
+                setIncompleteState();
+                return;
+            }
+
+            // Validar negativos
+            if (alb < 0 || lym < 0 || cho < 0) {
+                document.getElementById('status-text').innerText = "Los valores no pueden ser negativos.";
+                document.getElementById('status-text').className = "text-red-500 font-bold";
+                return;
+            }
+
+            // Calcular Total
+            const sAlb = getAlbuminScore(alb);
+            const sLym = getLymphocyteScore(lym);
+            const sCho = getCholesterolScore(cho);
+            const total = sAlb + sLym + sCho;
+
+            // Actualizar UI
+            const alertData = getAlertLevel(total);
+
+            // Panel
+            document.getElementById('display-total').innerText = total;
+            document.getElementById('display-total').className = `text-5xl font-extrabold ${alertData.textClass}`;
+            
+            const badge = document.getElementById('badge-alert');
+            badge.className = `inline-flex items-center px-4 py-2 rounded-full text-sm font-bold transition-colors duration-300 ${alertData.class}`;
+            badge.innerText = alertData.level;
+
+            document.getElementById('score-alb').innerText = sAlb;
+            document.getElementById('score-lym').innerText = sLym;
+            document.getElementById('score-cho').innerText = sCho;
+
+            document.getElementById('bg-indicator').className = `absolute right-0 top-0 h-full w-2 transition-colors duration-300 ${alertData.class.split(' ')[0].replace('bg-', 'bg-').replace('100', '500')}`;
+
+            // Status Icon OK
+            document.getElementById('status-icon').innerHTML = `
+                <div class="bg-green-100 p-2 rounded-full text-green-600">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                    </svg>
+                </div>`;
+            document.getElementById('status-text').innerText = "Cálculo completado correctamente";
+            document.getElementById('status-text').className = "text-sm text-green-600 font-medium";
+
+            // Interpretation Section
+            document.getElementById('interpretation-text').innerText = getInterpretationText(total);
+            
+            const gauge = document.getElementById('risk-gauge');
+            gauge.className = `w-32 h-32 rounded-full border-8 flex items-center justify-center mx-auto transition-colors duration-500 ${alertData.border}`;
+            
+            const gaugeText = document.getElementById('risk-gauge-text');
+            gaugeText.innerText = total;
+            gaugeText.className = `text-3xl font-bold ${alertData.textClass}`;
+        }
+
+        function updateDetailRow(rowId, valId, ptsId, hasData, val, points) {
+            const row = document.getElementById(rowId);
+            if (hasData) {
+                row.classList.remove('opacity-50');
+                row.classList.add('opacity-100', 'border-blue-200', 'shadow-sm');
+                document.getElementById(valId).innerText = val;
+                document.getElementById(ptsId).innerText = points;
+                // Add color highlight if points > 0
+                if(points > 0) {
+                    document.getElementById(ptsId).classList.add('text-orange-600');
+                    document.getElementById(ptsId).classList.remove('text-gray-900');
+                } else {
+                    document.getElementById(ptsId).classList.add('text-gray-900');
+                    document.getElementById(ptsId).classList.remove('text-orange-600');
+                }
+            } else {
+                row.classList.add('opacity-50');
+                row.classList.remove('opacity-100', 'border-blue-200', 'shadow-sm');
+                document.getElementById(valId).innerText = '--';
+                document.getElementById(ptsId).innerText = '-';
+            }
+        }
+
+        function setIncompleteState() {
+            document.getElementById('display-total').innerText = '-';
+            document.getElementById('display-total').className = 'text-5xl font-extrabold text-gray-900';
+            
+            const badge = document.getElementById('badge-alert');
+            badge.className = 'inline-flex items-center px-4 py-2 rounded-full text-sm font-bold bg-gray-100 text-gray-500';
+            badge.innerText = 'Esperando datos...';
+
+            document.getElementById('bg-indicator').className = 'absolute right-0 top-0 h-full w-2 bg-gray-200';
+
+            document.getElementById('status-icon').innerHTML = `
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>`;
+            document.getElementById('status-text').innerText = "Ingresa los 3 valores para calcular.";
+            document.getElementById('status-text').className = "text-sm text-gray-500";
+            document.getElementById('status-icon').className = "mb-2 text-gray-300";
+
+            document.getElementById('score-alb').innerText = '-';
+            document.getElementById('score-lym').innerText = '-';
+            document.getElementById('score-cho').innerText = '-';
+            
+            document.getElementById('interpretation-text').innerText = "Completa los datos arriba para ver la interpretación clínica detallada.";
+            document.getElementById('risk-gauge').className = "w-32 h-32 rounded-full border-8 border-gray-200 flex items-center justify-center mx-auto transition-colors duration-500";
+            document.getElementById('risk-gauge-text').innerText = "--";
+            document.getElementById('risk-gauge-text').className = "text-3xl font-bold text-gray-300";
+        }
+
+        function resetCalculator() {
+            document.getElementById('albumin').value = '';
+            document.getElementById('lymphocytes').value = '';
+            document.getElementById('cholesterol').value = '';
+            calculateCONUT();
+        }
+
+        // Init
+        setIncompleteState();
+    </script>
+</body>
+</html>
